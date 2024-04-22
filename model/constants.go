@@ -1,4 +1,4 @@
-package ezstorage
+package model
 
 const (
 	GCP = "gcp"
