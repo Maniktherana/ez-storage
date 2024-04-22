@@ -7,11 +7,13 @@ import (
 
 	"github.com/achintya-7/ez-storage/internal/gcp"
 	"github.com/achintya-7/ez-storage/model"
+	"google.golang.org/api/option"
 )
 
 type StorageConfig struct {
-	Type    string
-	Context context.Context
+	Type      string
+	Context   context.Context
+	GcsOption []option.ClientOption
 }
 
 type StorageFunctioner interface {
@@ -25,15 +27,17 @@ type StorageFunctioner interface {
 }
 
 // todo: Implement AWS client
-// todo: Add option to pass opts to client
-func NewClient(config StorageConfig) (storageClient StorageFunctioner, err error) {
-	if config.Context == nil {
-		config.Context = context.Background()
+func NewClient(configs StorageConfig) (storageClient StorageFunctioner, err error) {
+	if configs.Context == nil {
+		configs.Context = context.Background()
 	}
 
-	switch config.Type {
+	switch configs.Type {
 	case model.GCP:
-		gcpClient, err := gcp.NewGcpClient(config.Context)
+		opts := []option.ClientOption{}
+		opts = append(opts, configs.GcsOption...)
+
+		gcpClient, err := gcp.NewGcpClient(configs.Context, opts)
 		if err != nil {
 			return nil, err
 		}
