@@ -1,6 +1,6 @@
 package ezstorage
 
 const (
-	GCP = "gcsp"
+	GCP = "gcp"
 	AWS = "aws"
 )

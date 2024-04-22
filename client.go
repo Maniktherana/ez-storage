@@ -26,7 +26,7 @@ type StorageFunctioner interface {
 // todo: Define error types
 // todo: Implement AWS client
 // todo: Add option to pass opts to client
-func NewClient(config StorageConfig) (StorageFunctioner, error) {
+func NewClient(config StorageConfig) (storageClient StorageFunctioner, err error) {
 	if config.Context == nil {
 		config.Context = context.Background()
 	}
