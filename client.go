@@ -3,8 +3,10 @@ package ezstorage
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/achintya-7/ez-storage/internal/gcp"
+	"github.com/achintya-7/ez-storage/model"
 )
 
 type StorageConfig struct {
@@ -15,15 +17,13 @@ type StorageConfig struct {
 type StorageFunctioner interface {
 	ListBuckets(ctx context.Context, projectId string) (buckets []string, err error)
 	ListObjects(ctx context.Context, bucket, path string) (objs []string, err error)
-	// todo: implement more functions
-	// FolderSize(ctx context.Context, bucket string, path string) (size int64, err error)
-	// DeleteFolder(ctx context.Context, bucket, path string) (err error)
-	// GetSignedDownloadURL(ctx context.Context, bucket, path string) (url string, err error)
-	// GetSignedUploadUrl(ctx context.Context, bucket, path string) (url string, err error)
-	// GetAttributes(ctx context.Context, bucket, path string) (attrs map[string]any, err error)
+	GetPathSize(ctx context.Context, bucket string, path string) (size int64, err error)
+	DeleteFolder(ctx context.Context, bucket, path string) (err error)
+	GetSignedDownloadURL(ctx context.Context, bucket, path string, expiry time.Time) (url string, err error)
+	GetSignedUploadUrl(ctx context.Context, bucket, path string, expiry time.Time) (url string, err error)
+	GetAttributes(ctx context.Context, bucket, path string) (attrs *model.ObjAttrs, err error)
 }
 
-// todo: Define error types
 // todo: Implement AWS client
 // todo: Add option to pass opts to client
 func NewClient(config StorageConfig) (storageClient StorageFunctioner, err error) {
@@ -32,7 +32,7 @@ func NewClient(config StorageConfig) (storageClient StorageFunctioner, err error
 	}
 
 	switch config.Type {
-	case GCP:
+	case model.GCP:
 		gcpClient, err := gcp.NewGcpClient(config.Context)
 		if err != nil {
 			return nil, err
@@ -40,7 +40,7 @@ func NewClient(config StorageConfig) (storageClient StorageFunctioner, err error
 
 		return gcpClient, nil
 
-	case AWS:
+	case model.AWS:
 
 	default:
 		return nil, errors.New("invalid storage type in config")
